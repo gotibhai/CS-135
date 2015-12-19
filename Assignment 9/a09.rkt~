@@ -1,0 +1,140 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname a09) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+;;PART A------------------------------------------------
+
+;;(intersection ls1 ls2) produces a list of elements which are in both
+;; lists, ls1 and ls2.
+;;
+;;intersection: (listof Any) (listof Any) -> (listof Any)
+;; requires: no duplicates in either list
+;;
+;;Examples:
+
+
+(define (intersection list1 list2)
+  (foldr (lambda (x y)
+            (cond [(member? x list2)
+                   (cons x y)]
+                  [else y])) empty list1))
+
+;;Tests:
+
+
+;;PART B------------------------------------------------
+
+;;(union list1 list2) produces a list containing all elements
+;; of ls1 and ls2 excluding duplicates.
+;;
+;;union: (listof Any) (listof Any) -> (listof Any)
+;; requires: no duplicates in either list
+;;
+;;Examples:
+
+(define (union list1 list2)
+  
+  (foldr (lambda (x y)
+           (cond [(not(member? x list2))
+                   (cons x y)]
+                  [else y])) list2 list1))
+
+;;Tests:
+(check-expect (union empty '(10 20 "ui" a))
+              '(10 20 "ui" a))
+
+(check-expect (union '(1) '(2)) '(1 2))
+
+(check-expect (union '(1 2 3 4) '(4 2))
+              '(1 3 4 2))
+
+;;PART C------------------------------------------------ (NOT DONE)
+
+;;(unique-fn list predicate) produces a list which removes
+;; all duplicate elements according to the predicatefunction passed.
+;;
+;;unique-fn: (listof X) (X X-> Bool) -> (listof X)
+;;
+;;Examples:
+
+;(define (unique-fn list1 func)
+ ; (foldr func1 empty list1))
+
+
+;(lambda (x y)
+ ; (cond [(= empty (rest ls)) (cons (first ls) empty)]
+  ;      [(= true (foldr (predfn x (first y) empty ls))
+
+(define (help x ls fn)
+  (cond [(empty? ls) false]
+        [(equal? true (fn x (first ls))) true]
+        [(equal? false (fn x (first ls))) (help x (rest ls) fn)]))
+                                   
+                    
+(define (unique-fn list1 fn)
+  (cond [(empty? list1) empty]
+        [(empty? (rest list1)) (cons (first list1)  empty)]
+        [(help (first list1) (rest list1) fn) (unique-fn (rest list1) fn)]
+        [(equal? false (help (first list1) (rest list1) fn))
+          (cons (first list1) (unique-fn (rest list1) fn))]))
+
+;;PART D------------------------------------------------
+
+;;(cross ls1 ls2) produes a list of all possible pairs
+;; of elements in ls1 and ls2.
+;;
+;;cross: (listof Any) (listof Any) -> (listof (list Any Any))
+;;
+;;Examples:
+
+(define (cross ls1 ls2)
+  (foldr (lambda (z a) (foldr cons a z)) empty 
+(map (lambda (y) (map (lambda (x) (list x y)) ls1)) ls2)))
+
+;;Tests:
+;(cross (list 1 2 3 4)(list 9 5 6 7))
+
+
+;;PART E------------------------------------------------
+
+;;(jaccard ls1 ls2) computes the jaccard index of ls1 & ls2.
+;;
+;;jaccard: (listof Num) (listof Num) -> Num
+;; requires: both ls1 and ls2 can't be empty
+;;           (length ls1) =  (length ls2)
+;;Examples:
+
+(define (jaccard ls1 ls2)
+  (/ (length (intersection ls1 ls2)) (length(union ls1 ls2))))
+
+(check-expect (jaccard '(3 4 2 1) '(1 5 7 3)) 1/3)
+
+;;Tests:
+
+
+;;PART F------------------------------------------------
+
+;;(take num list1) takes in a number and a list and produces
+;;   only num number of elements of list1.
+;;
+;;take: Nat (listof Num) -> (listof Num)
+;;
+;;Examples:
+(check-expect (take 0 (list 1 2 4 4 4 4 4)) empty)
+(check-expect (take 1 (list 1 2 4 4 4 4 4)) (list 1))
+
+         
+(define (take num list1)
+
+  (cond [(zero? num) empty]
+        [(> num (length list1)) list1]
+        [(> num 0) (cons (first list1) (take (sub1 num) (rest list1)))]))
+
+;;Tests:
+(check-expect (take 5 (list 1 2 4 4 4 4 4))(list 1 2 4 4 4))
+(check-expect (take 1 empty) empty)
+(check-expect (take 5 (list 2 3 4 6 7 8)) (list 2 3 4 6 7))
+(check-expect (take 6 (list 2 3 4 6 7 8)) (list 2 3 4 6 7 8))
+(check-expect (take 0 empty) empty)
+
+
+

@@ -1,0 +1,5 @@
+;; A trivial puzzle, just for testing
+1
+###
+1
+CAT

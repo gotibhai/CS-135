@@ -1,0 +1,63 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname Untitled) (read-case-sensitive #t) (teachpacks ((lib "convert.rkt" "teachpack" "htdp") (lib "guess.rkt" "teachpack" "htdp") (lib "guess-gui.rkt" "teachpack" "htdp") (lib "gui.rkt" "teachpack" "htdp") (lib "master.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "convert.rkt" "teachpack" "htdp") (lib "guess.rkt" "teachpack" "htdp") (lib "guess-gui.rkt" "teachpack" "htdp") (lib "gui.rkt" "teachpack" "htdp") (lib "master.rkt" "teachpack" "htdp")) #t)))
+;;
+;;***************************************************
+;;Pushkin Abbott (#20620798)
+;;CS 135 Fall 2015
+;;Assignment 06, Problem 1
+;;***************************************************
+;;
+
+
+;; PART A -------------------------------------------------
+
+
+;; A Matrix is a (listof (listof Num))
+;; Requires: Length of all (listof Num) be the same
+
+(define M (list (list 1 2 3) (list 4 5 6) (list 7 8 9)))
+
+;;(list-recursion list nat-num n) returns the element of list at
+;;    place nat-num! It uses accumulative recursion.
+;;
+;;list-recursion: (listof Num) Nat -> Num
+;;
+;;Examples:
+(check-expect(M-recursion M 0 0) (list 1 2 3))
+(check-expect(M-recursion empty 0 0) empty)
+
+
+(define (M-recursion matrix nat-num n)
+  
+  (cond [(empty? matrix) empty]
+        [(= nat-num n) (first matrix)]
+        [else (M-recursion (rest matrix) nat-num (add1 n))]))
+
+;;Tests:
+(check-expect(M-recursion M 1 0) (list 4 5 6))
+(check-expect(M-recursion empty 2 0) empty)
+
+;;(matrix-row list nat-num) returns the element of list at
+;;  nat-num'th position using the helper function list-recursion.
+;;
+;; matrix-row: Matrix Nat -> (listof Num)
+;; requires: r < (length m)
+;;
+;;Examples:
+(check-expect (matrix-row M 2) (list 7 8 9))
+(check-expect (matrix-row M 0) (list 1 2 3))
+
+(define (matrix-row matrix nat-num)
+  
+  (M-recursion matrix nat-num 0))
+
+;;Tests:
+(check-expect (matrix-row M 1) (list 4 5 6))
+(check-expect (matrix-row empty 2) empty)
+
+
+;; PART B -------------------------------------------------
+
+
+

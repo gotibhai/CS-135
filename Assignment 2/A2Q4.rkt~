@@ -1,0 +1,23 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-reader.ss" "lang")((modname A2Q4) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
+(define (indigestible serving-size fat-content carb-content protein-content)
+  (- serving-size (+ fat-content carb-content protein-content)))
+
+(define (high-protein? protein-content)
+  (> protein-content 5))
+
+(define (calories serving-size fat-content carb-content protein-content)
+  (+(* 9 fat-content)(* 4 (+ carb-content protein-content))) )
+
+(define (low-carb? serving-size fat-content carb-content protein-content)
+  (or (< carb-content 2) (< (*(/ (* 4 carb-content) (calories serving-size fat-content carb-content protein-content))100) 5)))
+
+(define (zone? serving-size fat-content carb-content protein-content)
+  (and(and (<= (*(/ (* 9 fat-content) (calories serving-size fat-content carb-content protein-content))100) 32)
+           (>= (*(/ (* 9 fat-content) (calories serving-size fat-content carb-content protein-content))100) 28))
+      (and (<= (*(/ (* 4 carb-content) (calories serving-size fat-content carb-content protein-content))100) 42)
+           (>= (*(/ (* 4 carb-content) (calories serving-size fat-content carb-content protein-content))100) 38))
+      (and (<= (*(/ (* 4 protein-content) (calories serving-size fat-content carb-content protein-content))100) 32)
+           (>= (*(/ (* 4 protein-content) (calories serving-size fat-content carb-content protein-content))100) 28))))
+      

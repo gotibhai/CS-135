@@ -1,0 +1,27 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname |Assignment 8|) (read-case-sensitive #t) (teachpacks ((lib "convert.rkt" "teachpack" "htdp") (lib "guess.rkt" "teachpack" "htdp") (lib "guess-gui.rkt" "teachpack" "htdp") (lib "gui.rkt" "teachpack" "htdp") (lib "master.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "convert.rkt" "teachpack" "htdp") (lib "guess.rkt" "teachpack" "htdp") (lib "guess-gui.rkt" "teachpack" "htdp") (lib "gui.rkt" "teachpack" "htdp") (lib "master.rkt" "teachpack" "htdp")) #t)))
+(define-struct email-record (day-id hours-worked emails-sent))
+;; An Email-Record is a (make-email-record Nat Num Nat)
+;; requires: hours-worked >= 0
+
+(define-struct daily-stats (staff-id staff-name emails))
+;; A Daily-Stats is a (make-daily-stats Nat Str (listof Email-Record))
+;; requires: each day-id in emails is unique
+
+(define stats1 (list (make-email-record 1 7 20)
+                     (make-email-record 2 8 50)
+                     (make-email-record 3 6 30)
+                     (make-email-record 4 8 100)
+                     (make-email-record 5 7 50)))
+
+(define em1 (make-daily-stats 1 "Justin" empty))
+
+(define em2 (make-daily-stats 2 "Tolu" stats1))
+
+
+(define (avg-emails dailystats)
+  (cond [(empty?(daily-stats-emails dailystats)) 0]
+        [else (+ (email-record-emails-sent (first (daily-stats-emails dailystats)))
+                 (avg-emails 
+               

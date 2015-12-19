@@ -1,0 +1,19 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-reader.ss" "lang")((modname applicants) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
+(define-struct pprof (title wts))
+;; A position profile (PProf) is a (make-pprof Sym (listof Nat))
+
+;;(applicant-score applicant-ranking-list position-profile) produces an
+;;    applicant score by using applicant-ranking-list and position-profile.
+;;
+;;applicant-score: (listof Nat) PProf -> Nat
+;;
+;;Examples:
+
+(define (applicant-score applicant-ranking-list position-profile)
+  
+  (cond [(empty? applicant-ranking-list) 0]
+        (+ (* (first applicant-ranking-list) (first (pprof-wts position-profile)))
+           (applicant-score (rest applicant-ranking-list) (rest position-profile)))))
+        

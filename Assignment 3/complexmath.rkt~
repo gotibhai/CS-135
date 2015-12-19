@@ -1,0 +1,28 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-reader.ss" "lang")((modname complexmath) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
+;;
+;;***************************************************
+;;Pushkin Abbott (#20620798)
+;;CS 135 Fall 2015
+;;Assignment 02, Problem 4
+;;***************************************************
+;;
+
+(define (posn-mult posn1 posn2)
+  (make-posn
+   (- (*(posn-x posn1) (posn-x posn2)) (*(posn-y posn1) (posn-y posn2)))
+   (+ (*(posn-x posn1) (posn-y posn2)) (*(posn-y posn1) (posn-x posn2)))))
+
+(check-expect (posn-mult (make-posn 3 4) (make-posn 5 7)) (make-posn -13 41))
+(check-expect (posn-mult (make-posn 1 2) (make-posn 3 4)) (make-posn -5 10))
+
+
+;;***************************************************
+
+(define (posn-div posn1 posn2)
+  (/(+ (*(posn-x posn1) (posn-x posn2)) (*(posn-y posn1) (posn-y posn2)))
+    (+(sqr(posn-x posn2)) (sqr(posn-y posn2))))
+  (/(+ (*(posn-y posn1) (posn-x posn2)) (*(posn-x posn1) (posn-y posn2)))
+    (+(sqr(posn-x posn2)) (sqr(posn-y posn2)))))
+  

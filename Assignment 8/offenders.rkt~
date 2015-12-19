@@ -1,0 +1,147 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-reader.ss" "lang")((modname offenders) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
+;;
+;;***************************************************
+;;Pushkin Abbott (#20620798)
+;;CS 135 Fall 2015
+;;Assignment 08, Problem 3
+;;***************************************************
+;;
+
+;;PART A---------------------------------------------------------------
+
+(define-struct email (staff-id id-list word-count reply))
+;;An Email is a (make-email Nat (listof Nat) Nat (listof Email))
+
+;;DEFINITIONS --------------------------------------------------------
+
+(define email10 (make-email 2 (list 4 7) 5 empty))
+(define email9 (make-email 7 empty 3 empty))
+(define email8 (make-email 9 (list 4 7) 0 (list email10 email9)))
+(define email13 (make-email 9 (list 4 7) 0 empty))
+(define email7 (make-email 1 (list 2 3) 5 empty))
+(define email6 (make-email 2 (list 1 4 5) 10 (list email7)))
+(define email5 (make-email 3 (list 6 7) 15 (list email6)))
+(define email4 (make-email 1 (list 2 3 4 5 6 7) 20 empty))
+(define email11 (make-email 2 (list 4 7) 5 (list email4 email5)))
+(define email3 (make-email 2 (list 3 5 6) 25 empty))
+(define email2 (make-email 3 (list 4 7) 30 empty))
+(define email1 (make-email 1 (list 2 3 4 5 6 7) 35 (list email2 email3 email4)))
+(define email12 (make-email 2 (list 4 7) 5 (list email1 email2 email3 email4)))
+
+
+;;PART B---------------------------------------------------------------
+
+;;(total-word-count em) takes in an email and returns the total word count
+;;   of the email and its replies.
+;;
+;;total-word-count: Email -> Nat 
+;;
+;;Examples:
+(check-expect (total-word-count email1)110)
+(check-expect (total-word-count email2) 30)
+
+(define (total-word-count em)
+  
+  (local [(define (word-count ems)
+            (cond [(empty? ems) 0]
+                  [(not (cons? ems))
+                   (email-word-count ems)]
+                  [else(+ (email-word-count (first ems))
+                          (word-count (rest ems))
+                          (word-count (email-reply (first ems))))]))]
+    
+    (+ (word-count em)
+       (word-count (email-reply em)))))
+
+
+;;TESTS:
+(check-expect (total-word-count email3) 25)
+(check-expect (total-word-count email4) 20)
+(check-expect (total-word-count email5) 30)
+(check-expect (total-word-count email6) 15)
+(check-expect (total-word-count email13) 0)
+(check-expect (total-word-count email9) 3)
+(check-expect (total-word-count email10) 5)
+(check-expect (total-word-count email12) 190)
+(check-expect (total-word-count email11) 55)
+
+
+;;PART C ---------------------------------------------------------------
+
+;;(unique-email-senders loemails) takes in a list of emails (loemails) and
+;;    produces a list of unique sender id's
+;;
+;;unique-email-senders: (listof Emails) -> (listof Nat)
+;;
+;;Examples:
+(check-expect (unique-email-senders (list email1)) (list 3 2 1))
+
+(check-expect (unique-email-senders (list email7)) (list 1))
+
+
+(define (unique-email-senders loemails)
+  
+  (local [(define (in-list sender losender)
+            
+            (cond [(empty? losender) false]
+                  [(= sender (first losender)) true]
+                  [else (in-list sender (rest losender))]))
+          
+          (define (new-list losender)
+            
+            (cond [(empty? losender) empty]
+                  [(not(in-list (first losender) (rest losender)))
+                   (cons (first losender) (new-list (rest losender)))]
+                  [else (new-list (rest losender))]))
+    
+          (define (output-list loemails)
+            
+            (cond [(empty? loemails) empty]
+                  [else (append (list(email-staff-id (first loemails)))
+                   (unique-email-senders (email-reply (first loemails)))
+                   (unique-email-senders (rest loemails)))]))]
+
+    (new-list (output-list loemails))))
+
+;;Tests:
+(check-expect (unique-email-senders (list (make-email 3 (list 4 7) 30 empty)
+                            (make-email 2 (list 3 5 6) 25 empty)))
+                      (list 3 2))
+(check-expect (unique-email-senders (list email1 email7 email2 email3))
+              (list 1 3 2))
+
+(check-expect (unique-email-senders (list email7)) (list 1))
+
+(check-expect (unique-email-senders (list email8 email9)) (list 9 2 7))
+
+
+
+
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                   
+
+
+
+
+                                  
+                                   

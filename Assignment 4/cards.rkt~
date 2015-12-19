@@ -1,0 +1,105 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-reader.ss" "lang")((modname cards) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
+;;
+;;***************************************************
+;;Pushkin Abbott (#20620798)
+;;CS 135 Fall 2015
+;;Assignment 02, Problem 1
+;;***************************************************
+;;
+
+(define-struct card (strength speed intelligence charm))
+;; A card is a (make-card Num Num Num Num)
+
+;;(card-to-list card1) consumes a card and produces a list of four numbers.
+;;
+;;card-to-list: Card -> listof Num
+;;
+;;Examples:
+
+(define (card-to-list card1)
+  (cons (card-strength card1)
+        (cons  (card-speed card1)
+               (cons (card-intelligence card1)
+                     (cons (card-charm card1) empty)))))
+
+(card-to-list (make-card 12 23 45 67))
+
+;;(list-to-card list1) consumes a list(list1) of four numbers and produces a card.
+;;
+;;list-to-card: list1 -> Card
+;;
+;;Examples:
+
+(define (list-to-card list1)
+  (make-card (first list1) (second list1) (third list1) (fourth list1)))
+
+(list-to-card (cons 1(cons 2(cons 3(cons 4 empty)))))
+
+;;(card-regular? card1) consumes a card and tells if its a regular card or not.
+;;
+;;card-regular: Card -> Bool
+;;
+;;Examples:
+(check-expect(card-regular? (make-card 10 3 4 2))false) 
+(check-expect(card-regular? (make-card 10 10 10 10))false)
+
+;;(sum-of-list list1) takes in a listof Num and calculates the sum of the numbers.
+;;
+;;sum-of-list: (listof Num) -> Num
+;;
+;;Examples:
+(check-expect(sum-of-list (cons 1(cons 2(cons 3 empty)))) 6)
+(check-expect(sum-of-list (cons 10(cons 2(cons 12 empty)))) 24)
+
+(define (sum-of-list list1)
+  (cond [(empty? list1) 0]
+        [else (+ (first list1) (sum-of-list (rest list1)))]))
+
+;;Tests:
+(check-expect(sum-of-list (cons 0(cons 1(cons 69 empty)))) 70)
+(check-expect(sum-of-list (cons 100(cons 2(cons 69 empty)))) 171)
+
+
+(define (card-regular? card1)
+  (cond [(= (sum-of-list (card-to-list card1)) 10) true]
+        [else false]))
+        
+;;Tests:
+(check-expect(card-regular? (make-card -1 4 4 2))false)
+(check-expect(card-regular? (make-card 10 0 0 0))true)
+(check-expect(card-regular? (make-card  1 0 4 5))true)
+
+
+
+(define (compare-lists list1 list2)
+  (cond [(empty? list1) true]
+        [(empty? list2) true]
+        [(and(> (first list1)  (first list2)) (compare-lists (rest list1) (rest list2))) true]
+        [(and(< (first list1)  (first list2)) (compare-lists (rest list1) (rest list2))) false]
+        [else 'draw]))
+       
+(compare-lists (cons 2(cons 2(cons 3(cons 4 empty)))) (cons 3(cons 3(cons 4(cons 5 empty)))))
+;;(define (card-battle card1 card2)
+ ;; (
+        
+;;(card-battle (make-card 2 2 2 4) (make-card 4 3 2 1))
+
+(define (card-select card-list opponent-card)
+  (cond [(empty? card-list) empty]
+        [(symbol=? 'win (card-battle (first card-list) opponent-card)) (first card-list)]
+        [(> 1 0) (card-select (rest card-list) opponent-card)]
+        [else false]))
+
+
+                                                      
+             
+             
+             
+
+
+
+
+
+

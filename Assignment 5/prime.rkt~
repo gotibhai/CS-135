@@ -1,0 +1,31 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-reader.ss" "lang")((modname prime) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
+;;
+;;***************************************************
+;;Pushkin Abbott (#20620798)
+;;CS 135 Fall 2015
+;;Assignment 05, Problem 1
+;;***************************************************
+;;
+
+;; PART A -------------------------------------------------
+
+;;(prime? num) consumes a number produces true if that number
+;;     is prime and false otherwise.
+;;
+;;prime? : Nat -> Bool
+;;
+;;Examples:
+(check-expect (prime? 3) true)
+(check-expect (prime? 4) false)
+
+(define x 2)
+
+(define (count-factors num x)
+  (cond [(= (+ (/ num 2) 1) x) 0]
+        [(= 0 (remainder num x)) ( + 1 (count-factors num x+1))]
+        [else (count-factors num x+1)]))
+
+(define (prime? num)
+  (cond [(zero? num)

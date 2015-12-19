@@ -1,0 +1,28 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname initial-state) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+(require "puzlib.rkt")
+
+;; DATA DEFINITIONS
+
+;; A Puzzle is a (list (listof String) (listof String))
+
+;; A Grid is a (listof (listof Char))
+
+(define-struct wpos (row col horiz? len))
+;; A WPos (Word Position) is a (make-wpos Nat Nat Bool Nat)
+;; requires: len > 1
+
+(define-struct state (grid positions words))
+;; A State is a (make-state Grid (listof WPos) (listof Str))
+
+(define puzz01 (read-puzzle "puzzle01.txt"))
+(define (initial-state puzz)
+  (make-state (first puzz) (append (find-wpos (first puzz))
+                                   (find-wpos (transpose (first puzz))))
+              (second puzz)))
+
+(check-expect (initial-state puzz01)
+              (make-state (list (list #\# #\# #\#))
+                          (list (make-wpos 0 0 true 3))
+                          (list "CAT")))

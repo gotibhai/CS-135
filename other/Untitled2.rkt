@@ -1,0 +1,31 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-reader.ss" "lang")((modname Untitled2) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
+(define fat-calories 9)
+(define carb-calories 4)
+(define protein-calories 4)
+
+(define (calories serving-size fat-content carb-content protein-content)
+  
+  (+(* fat-calories fat-content)
+    (* protein-calories protein-content)
+    (* carb-content carb-calories)))
+
+
+(define (zone? serving-size fat-content carb-content protein-content)
+  
+  (and(and (<= (*(/ (* fat-calories fat-content)
+                    (calories serving-size fat-content carb-content protein-content))100) 32)
+           (>= (*(/ (* fat-calories fat-content)
+                    (calories serving-size fat-content carb-content protein-content))100) 28))
+      (and (<= (*(/ (* carb-calories carb-content)
+                    (calories serving-size fat-content carb-content protein-content))100) 42)
+           (>= (*(/ (* carb-calories carb-content)
+                    (calories serving-size fat-content carb-content protein-content))100) 38))
+      (and (<= (*(/ (* protein-calories protein-content)
+                    (calories serving-size fat-content carb-content protein-content))100) 32)
+           (>= (*(/ (* protein-calories protein-content)
+                    (calories serving-size fat-content carb-content protein-content))100) 28))))
+
+
+(check-expect(zone? 50 15 20 15)false)

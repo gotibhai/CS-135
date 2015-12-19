@@ -1,0 +1,69 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-reader.ss" "lang")((modname rockets) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
+(define-struct stage (fuel-mass dry-mass thrust isp))
+;;A Stage is a (make-stage Num Num Num Num)
+;;        requires fuel-mass > 0
+;;                 dry mass  > 0
+;;                 thrust    > 0
+;;                 isp       > 0
+;;
+;; A rocket is a (listof Stage)
+
+;;(rocket-mass rocket) consumes a rocket and produces the total mass in
+;; tonnes of that rocket.
+;;
+;;rocket-mass: Rocket -> Num
+;;
+;;Examples:
+
+
+
+(define (rocket-mass rocket)
+  (cond [(empty? rocket) 0]
+        [else (+(stage-fuel-mass (first rocket))(stage-dry-mass (first rocket))(rocket-mass (rest rocket)))]))
+
+;;Tests
+(rocket-mass (cons (make-stage 90 30 1629.25 3333) (cons (make-stage 9 4 191.1 4500) empty)))
+
+;;(rocket-twr rocket) consumes a rocket and produces a list of numbers.
+;;Each number is a thrust-to-weight ratio of that stage.
+;;
+;;rocket-twr: Rocket -> listof Num
+;;
+;;Examples
+
+
+(define g 9.8)
+
+(define (rocket-twr rocket)
+  (cond [(empty? rocket) empty]
+        [else (cons (/ (stage-thrust (first rocket))
+                          (* (rocket-mass rocket) g))
+                     (cons (/ (stage-thrust (first(rest rocket)))
+                          (* (rocket-mass (rest rocket)) g)) empty))]))
+
+
+(rocket-twr (cons (make-stage 90 30 1629.25 3333) (cons (make-stage 9 4 191.1 4500) empty)))
+                     
+;;(rocket-delta-v rocket) produces the total delta v for that rocket.
+;;
+;;rocket-delta-v: Rocket -> Num
+;;
+;;Examples;
+
+
+(define (rocket-delta-v rocket)
+  (cond [(empty? rocket) 0]
+        [else (+(* (stage-isp (first rocket))
+       (- (log (rocket-mass rocket))
+          (log (-(rocket-mass rocket)
+          (stage-fuel-mass (first rocket))))))
+    (rocket-delta-v (rest rocket)))]))
+
+;;Tests
+(rocket-delta-v (cons (make-stage 90 30 1629.25 3333) (cons (make-stage 9 4 191.1 4500) empty)))
+
+
+
+

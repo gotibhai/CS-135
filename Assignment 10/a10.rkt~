@@ -1,0 +1,13 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname a10) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+(define (merge-sort lon)
+  (cond [(empty? lon) empty]
+        [else (local
+          [(define mid (list-ref (/ (length lon) 2) lon))
+           (define less (filter (lambda (x) (<= x mid)) lon)))
+           (define greater (filter (lambda (x) (> x mid)) lon)))]
+            (merge (merge-sort less) (merge-sort greater)))]))
+
+
+(quick-sort (list 3 5 2 1 49 5 9 10 4))

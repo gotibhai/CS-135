@@ -1,0 +1,603 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname patient) (read-case-sensitive #t) (teachpacks ((lib "convert.rkt" "teachpack" "htdp") (lib "guess.rkt" "teachpack" "htdp") (lib "guess-gui.rkt" "teachpack" "htdp") (lib "gui.rkt" "teachpack" "htdp") (lib "master.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "convert.rkt" "teachpack" "htdp") (lib "guess.rkt" "teachpack" "htdp") (lib "guess-gui.rkt" "teachpack" "htdp") (lib "gui.rkt" "teachpack" "htdp") (lib "master.rkt" "teachpack" "htdp")) #t)))
+;;
+;;***************************************************
+;;Pushkin Abbott (#20620798)
+;;CS 135 Fall 2015
+;;Assignment 06, Problem 1
+;;***************************************************
+;;
+
+
+;; PART A -------------------------------------------------
+
+
+(define half 0.5)
+(define sys-const 70)
+(define sys-const-2 150)
+(define oxy-const 90)
+(define temp-const 95)
+(define temp-const-2 104)
+
+;;(bps sys) takes in the sys value and gives the appropriate
+;;    value for calculating severity-score!
+;;
+;;bps: Int -> Num
+;;
+;;Examples:
+(check-expect (bps 60) 5)
+(check-expect (bps 170) 10)
+
+(define (bps sys)
+  
+  (cond [(< sys sys-const) (* half(- sys-const sys))]
+        [(> sys sys-const-2) (* half (- sys sys-const-2))]
+        [(and (>= sys sys-const) (<= sys sys-const-2)) 0]))
+
+;;Tests:
+(check-expect (bps 130) 0)
+(check-expect (bps 70) 0)
+(check-expect (bps 150) 0)
+
+;;(oxy level) takes in the oxy-level and produces a valid output
+;;   for the severity-score!
+;;
+;;oxy: Num -> Num
+;;
+;;Examples:
+(check-expect (oxy 100) 0)
+(check-expect (oxy 90) 0)
+                       
+(define (oxy level)
+  
+  (cond [(< level oxy-const) (expt 2 (- oxy-const level))]
+        [else 0]))
+
+;;Examples:
+(check-expect (oxy 89) 2)
+(check-expect (oxy 88) 4)
+(check-expect (oxy 87) 8)
+(check-expect (oxy 80) 1024)
+
+
+;;(temprature temp) takes in a temp and produces an output
+;;     valid for the severity score!
+;;
+;;temprature: Num -> Num
+;;
+;;Examples:
+(check-expect (temprature 90) 5)
+(check-expect (temprature 98) 0)
+
+(define (temprature temp)
+  
+  (cond [(< temp temp-const) (- temp-const temp)]
+        [(> temp temp-const-2) (- temp temp-const-2)]
+        [(and (>= temp temp-const) (<= temp temp-const-2)) 0]))
+
+;;Tests:
+(check-expect (temprature 95) 0)
+(check-expect (temprature 104) 0)
+(check-expect (temprature 97) 0)
+(check-expect (temprature 94) 1)
+(check-expect (temprature 110) 6)
+
+;;A Patient-Profile is a (list Str Int Num Num)
+
+;;(patient-severity P-profile) takes in a patient-profile
+;;    and calculates its score!
+;;
+;;patient-severity: Patient-Profile -> Num
+;;
+;;Examples:
+(check-expect(patient-severity (list "Alice" 10 90 10))115)
+(check-expect(patient-severity (list "Alice" 0 90 0))130)
+
+(define (patient-severity P-profile)
+
+  (cond [(empty? P-profile) 0]
+        [else (+ (bps (second P-profile))
+                 (oxy(third P-profile))
+     (temprature (fourth P-profile)))]))
+
+;;Tests:
+(check-expect(patient-severity (list "Alice" 60 90 94)) 6)
+(check-expect(patient-severity (list "Alice" 70 89 98))2)
+(check-expect(patient-severity (list "Alice" 69 89 105)) 3.5)
+(check-expect(patient-severity (list "Alice" 120 95 97)) 0)
+(check-expect(patient-severity (list "Alice" 170 91 106)) 12)
+(check-expect(patient-severity (list "Alice" 50 88 90)) 19)
+(check-expect(patient-severity (list "Alice" 0 90 104)) 35)
+(check-expect(patient-severity (list "Alice" 70 90 98)) 0)
+(check-expect(patient-severity (list "Alice" 0 90 94)) 36)
+(check-expect(patient-severity empty) 0)
+(check-expect(patient-severity (list "Alice" 0 0 0))
+                       1237940039285380274899124354)
+
+
+;; PART B -------------------------------------------------
+
+
+;A Priority-List is a (listof (list Num Patient-Profile))
+
+;; A Priority-List is one of:
+;; * empty
+;; * (listof (list Num Patient-Profile))
+
+;; (define (priority-list-fn pl)
+;;  (cond
+;;    [(empty? pl) ...]
+;;    [... (first (first pl)) ....]
+;;    [... (second (first pl)) ...]))
+
+
+;; PART C -------------------------------------------------
+
+
+;;(insert-priority-list priority-list P-profile) takes in a patient-profile
+;;    and inserts it into priority-list!
+;;
+;;insert-priority: Priority-list Patient-Profile -> Priority-list
+;;
+;;Examples:
+(check-expect (insert-priority-list empty (list "Ben" 10 89 100))
+              (list(list 32 (list "Ben" 10 89 100))))
+
+(check-expect (insert-priority-list
+ (list
+ (list 32 (list "Ben" 10 89 100))
+ (list 1 (list "Brian" 140 97 105))
+ (list 10.5 (list "Alice" 65 87 100))
+ (list 8308 (list "Josh" 81 77 220))
+ (list 4112 (list "Louis" 76 78 120)))
+ (list "Ben" 70 90 97))
+(list
+ (list 32 (list "Ben" 10 89 100))
+ (list 1 (list "Brian" 140 97 105))
+ (list 10.5 (list "Alice" 65 87 100))
+ (list 8308 (list "Josh" 81 77 220))
+ (list 4112 (list "Louis" 76 78 120))
+ (list 0 (list "Ben" 70 90 97))))
+
+(define (insert-priority-list priority-list P-profile)
+  
+  (cond [(empty? priority-list)
+         (list(list (patient-severity P-profile) P-profile))]
+        [(> (patient-severity P-profile) (first (first priority-list)))
+         (cons (list (patient-severity P-profile) P-profile) priority-list)]
+        [else (cons (first priority-list)
+                    (insert-priority-list (rest priority-list) P-profile))]))
+
+;;Tests:
+(check-expect (insert-priority-list '((1 ("Brian" 140 97 105)))
+                                          '("Alice" 65 87 100))
+             '((10.5 ("Alice" 65 87 100)) (1 ("Brian" 140 97 105))))
+
+(check-expect (insert-priority-list (list (list 32 (list "Ben" 10 89 100))
+                                          (list 1(list "Brian" 140 97 105)))
+                                          (list "Alice" 65 87 100))
+                                    (list (list 32 (list "Ben" 10 89 100))
+                                          (list 10.5 (list "Alice" 65 87 100))
+                                          (list 1 (list "Brian" 140 97 105))))
+
+(check-expect
+ (insert-priority-list
+ (list
+ (list 32 (list "Ben" 10 89 100))(list 1 (list "Brian" 140 97 105))
+ (list 10.5 (list "Alice" 65 87 100))(list 8308 (list "Josh" 81 77 220))
+ (list 4112 (list "Louis" 76 78 120)))(list "Pushkin" 100 90 107))
+ (list
+ (list 32 (list "Ben" 10 89 100))(list 3 (list "Pushkin" 100 90 107))
+ (list 1 (list "Brian" 140 97 105))(list 10.5 (list "Alice" 65 87 100))
+ (list 8308 (list "Josh" 81 77 220))(list 4112 (list "Louis" 76 78 120))))
+
+(check-expect
+ (insert-priority-list
+ (list
+ (list 0 (list "Ben" 70 90 100))(list 0 (list "Brian" 70 90 98)))
+ (list "Pushkin" 150 90 102))
+ (list
+ (list 0 (list "Ben" 70 90 100))(list 0 (list "Brian" 70 90 98))
+ (list 0 (list "Pushkin" 150 90 102))))
+
+(check-expect
+ (insert-priority-list
+ (list
+ (list 1 (list "Ben" 68 90 100))(list 1 (list "Brian" 68 90 98)))
+ (list "Pushkin" 152 90 102))
+ (list
+ (list 1 (list "Ben" 68 90 100))(list 1 (list "Brian" 68 90 98))
+ (list 1 (list "Pushkin" 152 90 102))))
+
+(check-expect
+ (insert-priority-list
+ (list
+ (list 1 (list "Ben" 68 90 100))(list 1 (list "Brian" 68 90 98)))
+ (list "Pushkin" 154 90 102))
+ (list
+ (list 2 (list "Pushkin" 154 90 102))(list 1 (list "Ben" 68 90 100))
+ (list 1 (list "Brian" 68 90 98))))
+ 
+
+;; PART D -------------------------------------------------
+
+;;(form-priority-list list-profiles) takes in a list of patient-profiles
+;;   and produces a priority-list!!
+;;
+;;form-priority-list: (listof Patient-Profile) -> Priority-list
+;;
+;;Examples:
+(check-expect (form-priority-list (list (list "Ben" 68 90 100)
+                                        (list "Brian" 68 90 98)
+                                        (list "Pushkin" 154 90 102)))
+                                  (list (list 1 (list "Ben" 68 90 100))
+                                        (list 1 (list "Brian" 68 90 98))
+                                        (list 2 (list "Pushkin" 154 90 102))))
+
+(check-expect (form-priority-list (list (list "Brian" 70 90 98)
+                                        (list "Brian" 68 90 98)
+                                        (list "Pushkin" 10 90 105)))
+              (list  (list 0 (list "Brian" 70 90 98))
+                     (list 1 (list "Brian" 68 90 98))
+                     (list 31 (list "Pushkin" 10 90 105))))
+              
+(define (form-priority-list list-profiles)
+  
+  (cond [(empty? list-profiles) empty]
+        [else (cons (cons (patient-severity (first list-profiles))
+                          (list (first list-profiles)))
+                    (form-priority-list (rest list-profiles)))]))
+
+;;Tests:
+(check-expect (form-priority-list empty) empty)
+
+(check-expect (form-priority-list (list (list "Brian" 70 90 98)))
+              (list  (list 0 (list "Brian" 70 90 98))))
+
+;;(sortinglist p-list) uses insert-priority-list to sort the priority-list.
+;;
+;;sortinglist: Priority-list -> Priority-list
+;;
+;;Examples:
+ (check-expect (sortinglist
+                (list (list 1 (list "Ben" 68 90 100))
+                      (list 1 (list "Brian" 68 90 98))
+                      (list 2 (list "Pushkin" 154 90 102))))
+               (list  (list 2 (list "Pushkin" 154 90 102))
+                      (list 1 (list "Brian" 68 90 98))
+                      (list 1 (list "Ben" 68 90 100))))
+
+ (check-expect (sortinglist
+                (list (list 32 (list "Ben" 10 89 100))
+                      (list 1 (list "Brian" 140 97 105))
+                      (list 10.5 (list "Alice" 65 87 100))
+                      (list 8308 (list "Josh" 81 77 220))
+                      (list 4112 (list "Louis" 76 78 120))))
+                (list (list 8308 (list "Josh" 81 77 220))
+                      (list 4112 (list "Louis" 76 78 120))
+                      (list 32 (list "Ben" 10 89 100))
+                      (list 10.5 (list "Alice" 65 87 100))
+                      (list 1 (list "Brian" 140 97 105))))
+
+
+(define (sortinglist p-list)
+  
+  (cond [(empty? p-list) empty]
+        [else (insert-priority-list
+               (sortinglist (rest p-list)) (second (first p-list)))]))
+
+;;Tests:
+(check-expect (sortinglist (list (list 32 (list "Ben" 10 89 100))
+                                 (list 10.5 (list "Alice" 65 87 100))
+                                 (list 1 (list "Brian" 140 97 105))))
+                           (list (list 32 (list "Ben" 10 89 100))
+                                 (list 10.5 (list "Alice" 65 87 100))
+                                 (list 1 (list "Brian" 140 97 105))))
+
+(check-expect (sortinglist (list (list 2 (list "Alice" 70 89 98))
+                                 (list 0 (list "Alice" 120 95 97))
+                                 (list 6 (list "Alice" 60 90 94))))
+                           (list (list 6 (list "Alice" 60 90 94))
+                                 (list 2 (list "Alice" 70 89 98))
+                                 (list 0 (list "Alice" 120 95 97))))
+
+(check-expect (sortinglist empty) empty)
+
+(check-expect (sortinglist (list (list 0 (list "Brian" 70 90 98))
+                                 (list 1 (list "Brian" 68 90 98))
+                                 (list 31 (list "Pushkin" 10 90 105))))
+                           (list (list 31 (list "Pushkin" 10 90 105))
+                                 (list 1 (list "Brian" 68 90 98))
+                                 (list 0 (list "Brian" 70 90 98))))
+                                 
+;;(sort-priority-list p-profiles) takes in a list of Patient-profiles(p-profiles)
+;;   and returns a sorted priority-list!
+;;
+;;sort-priority-list Patient-profiles -> Priority-list
+;;
+;;Examples:
+(check-expect (sort-priority-list
+                (list (list "Ben" 68 90 100)
+                      (list "Brian" 68 90 98)
+                      (list "Pushkin" 154 90 102)))
+               (list  (list 2 (list "Pushkin" 154 90 102))
+                      (list 1 (list "Brian" 68 90 98))
+                      (list 1 (list "Ben" 68 90 100)))) 
+
+ (check-expect (sort-priority-list
+                (list (list "Ben" 10 89 100)
+                      (list "Brian" 140 97 105)
+                      (list "Alice" 65 87 100)
+                      (list "Josh" 81 77 220)
+                      (list "Louis" 76 78 120)))
+                (list (list 8308 (list "Josh" 81 77 220))
+                      (list 4112 (list "Louis" 76 78 120))
+                      (list 32 (list "Ben" 10 89 100))
+                      (list 10.5 (list "Alice" 65 87 100))
+                      (list 1 (list "Brian" 140 97 105))))
+
+(define (sort-priority-list p-profiles)
+  
+  (sortinglist (form-priority-list p-profiles)))
+
+;;Tests:
+(check-expect (sort-priority-list
+             '(("Brian" 140 97 105)("Alice" 65 87 100)("ben" 65 89 100)))
+              (list (list 10.5 (list "Alice" 65 87 100))
+                    (list 4.5 (list "ben" 65 89 100))
+                    (list 1 (list "Brian" 140 97 105))))
+
+(check-expect (sort-priority-list (list (list "Ben" 10 89 100)
+                                 (list "Alice" 65 87 100)
+                                 (list "Brian" 140 97 105)))
+                           (list (list 32 (list "Ben" 10 89 100))
+                                 (list 10.5 (list "Alice" 65 87 100))
+                                 (list 1 (list "Brian" 140 97 105))))
+
+(check-expect (sort-priority-list (list
+                                  (list "Alice" 70 89 98)
+                                  (list "Alice" 120 95 97)
+                                  (list "Alice" 60 90 94)))
+                           (list (list 6 (list "Alice" 60 90 94))
+                                 (list 2 (list "Alice" 70 89 98))
+                                 (list 0 (list "Alice" 120 95 97))))
+
+(check-expect (sort-priority-list empty) empty)
+
+(check-expect (sort-priority-list (list (list "Brian" 70 90 98)
+                                  (list "Brian" 68 90 98)
+                                  (list "Pushkin" 10 90 105)))
+                            (list (list 31 (list "Pushkin" 10 90 105))
+                                  (list 1 (list "Brian" 68 90 98))
+                                  (list 0 (list "Brian" 70 90 98))))
+
+
+;; PART E -------------------------------------------------
+
+
+;;(merge-priority-list p-list1 p-list2) takes in 2 priority lists
+;;     and merges them!
+;;
+;;merge-priority-list: Priority-list Priority-list -> Priority-list
+;;
+;;Examples:
+(check-expect (merge-priority-list(list (list 31 (list "Pushkin" 10 90 105))
+                                  (list 1 (list "Brian" 68 90 98))
+                                  (list 0 (list "Brian" 70 90 98)))
+                                  (list (list 6 (list "Alice" 60 90 94))
+                                  (list 2 (list "Alice" 70 89 98))
+                                  (list 0 (list "Alice" 120 95 97))))
+              (list (list 31 (list "Pushkin" 10 90 105))
+                    (list 6 (list "Alice" 60 90 94))
+                    (list 2 (list "Alice" 70 89 98))
+                    (list 1 (list "Brian" 68 90 98))
+                    (list 0 (list "Alice" 120 95 97))
+                    (list 0 (list "Brian" 70 90 98))))
+
+
+(check-expect (merge-priority-list (list (list 32 (list "Ben" 10 89 100))
+                                 (list 10.5 (list "Alice" 65 87 100))
+                                 (list 1 (list "Brian" 140 97 105)))
+                                 (list (list 6 (list "Alice" 60 90 94))
+                                 (list 2 (list "Alice" 70 89 98))
+                                 (list 0 (list "Alice" 120 95 97))))
+                                 (list (list 32 (list "Ben" 10 89 100))
+                                       (list 10.5 (list "Alice" 65 87 100))
+                                       (list 6 (list "Alice" 60 90 94))
+                                       (list 2 (list "Alice" 70 89 98))
+                                       (list 1 (list "Brian" 140 97 105))
+                                       (list 0 (list "Alice" 120 95 97))))
+
+
+(define (merge-priority-list p-list1 p-list2)
+  
+  (cond [(and (empty? p-list1) (empty? p-list2))   empty]
+        [(and (empty? p-list1) (cons? p-list2))  p-list2]
+        [(and (cons? p-list1)  (empty? p-list2)) p-list1]
+        [(and (cons? p-list1) (cons? p-list2))
+         (cond [(> (first (first p-list1)) (first (first p-list2)))
+                (cons (first p-list1) (merge-priority-list (rest p-list1) p-list2))]
+                [else (cons (first p-list2) (merge-priority-list p-list1 (rest p-list2)))])]))
+
+
+;;Tests:
+(check-expect (merge-priority-list '((10.5 ("Alice" 65 87 100)))
+                                   '((1 ("Brian" 140 97 105))))
+              '((10.5 ("Alice" 65 87 100)) (1 ("Brian" 140 97 105))))
+
+(check-expect (merge-priority-list '((10.5 ("Alice" 65 87 100))) empty)
+              '((10.5 ("Alice" 65 87 100))))      
+           
+(check-expect (merge-priority-list(list (list 10.5 (list "Alice" 65 87 100))
+                     (list 4.5 (list "ben" 65 89 100))
+                     (list 1 (list "Brian" 140 97 105)))
+                     (list (list 12 (list "Alice" 65 87 100))
+                     (list 8 (list "ben" 65 89 100))
+                     (list 2 (list "Brian" 140 97 105))))
+                     (list (list 12 (list "Alice" 65 87 100))
+                           (list 10.5 (list "Alice" 65 87 100))
+                           (list 8 (list "ben" 65 89 100))
+                           (list 4.5 (list "ben" 65 89 100))
+                           (list 2 (list "Brian" 140 97 105))
+                           (list 1 (list "Brian" 140 97 105))))
+
+(check-expect (merge-priority-list empty empty) empty)
+
+
+
+;; PART F -------------------------------------------------
+
+;;(fix-element P-list) takes in a Priority list (P-list) and returns
+;;   a fixed Priority-list!
+;;
+;;fix-element: Priority-list -> Priority-list
+;;
+;;Examples:
+(check-expect (fix-element (list (list 100 (list "Alice" 65 87 100))
+                     (list 5 (list "ben" 65 89 100))
+                     (list 1 (list "Brian" 140 97 105))))
+              (list (list 10.5 (list "Alice" 65 87 100))
+                     (list 4.5 (list "ben" 65 89 100))
+                     (list 1 (list "Brian" 140 97 105))))
+
+(check-expect (fix-element (list (list 10.5 (list "Alice" 65 87 100))
+                     (list 4.5 (list "ben" 65 89 100))
+                     (list 1 (list "Brian" 140 97 105))))
+              (list (list 10.5 (list "Alice" 65 87 100))
+                     (list 4.5 (list "ben" 65 89 100))
+                     (list 1 (list "Brian" 140 97 105))))
+                            
+(define (fix-element  P-list)
+  
+  (cond [(empty? P-list) empty]
+        [else (cons (check-element (first P-list))
+                    (fix-element (rest P-list)))]))
+
+;;Tests:
+(check-expect (fix-element (list (list 1 (list "Alice" 65 87 100))))
+              (list (list 10.5 (list "Alice" 65 87 100))))
+                     
+(check-expect (fix-element (list (list 10.5 (list "Alice" 65 87 100))))  
+              (list (list 10.5 (list "Alice" 65 87 100))))
+
+;;(check-element P-list-element) takes in a element of Priority list
+;;   and checks if it's severity score is correct!
+;;
+;;check-element: Priority-list -> Priority-list
+;;
+;;Examples:
+(check-expect (check-element (list 10.5 (list "Alice" 65 87 100)))
+              (list 10.5 (list "Alice" 65 87 100)))
+
+(check-expect (check-element (list 1 (list "ben" 65 89 100)))
+              (list 4.5 (list "ben" 65 89 100)))
+              
+(define (check-element P-list-element)
+  
+  (cond [(= (first P-list-element)
+            (patient-severity (second P-list-element))) P-list-element]
+        [else (list (patient-severity (second P-list-element))
+                                   (second P-list-element))]))
+
+;;Tests:
+(check-expect (check-element (list 100 (list "Brian" 140 97 105)))
+              (list 1 (list "Brian" 140 97 105)))
+
+(check-expect (check-element (list 10 (list "ben" 70 90 100)))
+              (list 0 (list "ben" 70 90 100)))
+
+;;(fix-priority-list P-list) takes in a Priority list (P-list) and returns
+;;   a fixed Priority-list!
+;;
+;;fix-priority-list: Priority-list -> Priority-list
+;;
+;;Examples:
+(check-expect (fix-priority-list (list (list 10.5 (list "Alice" 65 87 100))
+                     (list 4.5 (list "ben" 65 89 100))
+                     (list 1 (list "Brian" 140 97 105))))
+              (list (list 10.5 (list "Alice" 65 87 100))
+                     (list 4.5 (list "ben" 65 89 100))
+                     (list 1 (list "Brian" 140 97 105))))
+
+(check-expect (fix-priority-list (list (list 105 (list "Alice" 65 87 100))
+                     (list 43 (list "ben" 65 89 100))
+                     (list 100 (list "Brian" 140 97 105))))
+              (list (list 10.5 (list "Alice" 65 87 100))
+                     (list 4.5 (list "ben" 65 89 100))
+                     (list 1 (list "Brian" 140 97 105))))
+
+
+
+(define (fix-priority-list P-list)
+  
+  (sortinglist (fix-element P-list)))
+
+
+
+(check-expect (fix-priority-list '((100 ("Brian" 140 97 105))
+                                   (5.5 ("Alice" 65 87 100))))
+       '((10.5 ("Alice" 65 87 100)) (1 ("Brian" 140 97 105))))
+                          
+(check-expect (fix-priority-list
+ (list
+ (list 12 (list "Alice" 65 87 100))
+ (list 4.5 (list "ben" 65 89 100))
+ (list 1 (list "Brian" 140 97 105))))
+ (list
+ (list 10.5 (list "Alice" 65 87 100))
+ (list 4.5 (list"ben" 65 89 100))
+ (list 1 (list"Brian" 140 97 105))))
+
+
+(check-expect (fix-priority-list (list
+ (list 12 (list "Alice" 65 87 100))
+ (list 10.5 (list "Alice" 65 87 100))
+ (list 8 (list "ben" 65 89 100))
+ (list 4.5 (list "ben" 65 89 100))
+ (list 2 (list "Brian" 140 97 105))
+ (list 1 (list "Brian" 140 97 105))))
+ (list
+ (list 10.5 (list"Alice" 65 87 100))
+ (list 10.5 (list "Alice" 65 87 100))
+ (list 4.5 (list"ben" 65 89 100))
+ (list 4.5 (list "ben" 65 89 100))
+ (list 1 (list"Brian" 140 97 105))
+ (list 1 (list "Brian" 140 97 105))))
+
+(check-expect (fix-priority-list
+               (list (list 100 (list "Brian" 140 97 105))))
+               (list (list 1 (list "Brian" 140 97 105))))
+
+(check-expect (fix-priority-list(list (list 1 (list "ben" 65 89 100))))
+               (list (list 4.5 (list "ben" 65 89 100))))
+
+(check-expect (fix-priority-list empty) empty)
+
+(check-expect (fix-priority-list (list(list 1 (list "Alice" 120 95 97))))
+                                (list (list 0 (list "Alice" 120 95 97))))
+
+(check-expect (fix-priority-list (list (list 0 (list "Ben" 10 89 100))
+                                       (list 0 (list "Alice" 65 87 100))
+                                       (list 0 (list "Alice" 60 90 94))
+                                       (list 0 (list "Alice" 70 89 98))
+                                       (list 0 (list "Brian" 140 97 105))
+                                       (list 0 (list "Alice" 120 95 97))))
+               (list (list 32 (list "Ben" 10 89 100))
+                     (list 10.5 (list "Alice" 65 87 100))
+                     (list 6 (list "Alice" 60 90 94))
+                     (list 2 (list "Alice" 70 89 98))
+                     (list 1 (list "Brian" 140 97 105))
+                     (list 0 (list "Alice" 120 95 97))))
+
+
+               
+
+
+
+
+
+                     
+         
+
+

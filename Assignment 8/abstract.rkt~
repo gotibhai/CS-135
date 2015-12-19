@@ -1,0 +1,49 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-reader.ss" "lang")((modname abstract) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
+;;
+;;***************************************************
+;;Pushkin Abbott (#20620798)
+;;CS 135 Fall 2015
+;;Assignment 08, Problem 4
+;;***************************************************
+;;
+
+;;PART A---------------------------------------------------------------
+
+;;(avg-without-recursion lon) consumes lon (list of natural numebers)
+;;   and
+;;
+;;avg-without-recursion: (listof Nat) -> (listof Num)
+;; requires: list must contain at least one even and one odd natural number.
+;;
+;;Examples:
+
+
+(define (avg-without-recursion lon)
+  (list (/ (foldr + 0 lon) (length lon))
+        (/ (foldr + 0 (filter even? lon)) (length lon))
+        (/ (foldr + 0 (filter odd? lon)) (length lon))))
+
+;;Tests:
+(check-expect (avg-without-recursion (list 5 2 3 5 6 7 9 25))
+              (list 7.75 1 6.75))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   

@@ -1,0 +1,46 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname transpose) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+;; A Puzzle is a (list (listof Str) (listof Str))
+
+;; A Grid is a (listof (listof Char))
+
+(define grid-abc  (list
+  (list #\. #\. #\. #\. #\. #\. #\. #\. #\# #\. #\.)
+  (list #\. #\. #\. #\. #\. #\. #\# #\# #\# #\# #\.)
+  (list #\. #\. #\. #\. #\. #\. #\. #\. #\# #\. #\.)
+  (list #\. #\. #\. #\. #\. #\# #\# #\# #\# #\# #\#)
+  (list #\. #\. #\. #\. #\. #\. #\# #\. #\# #\. #\.)
+  (list #\. #\. #\. #\. #\. #\. #\# #\. #\. #\. #\.)
+  (list #\. #\. #\. #\. #\. #\. #\# #\. #\. #\. #\.)
+  (list #\. #\. #\. #\# #\# #\# #\# #\. #\. #\. #\.)
+  (list #\. #\. #\. #\# #\. #\. #\# #\. #\. #\. #\.)
+  (list #\# #\# #\# #\# #\. #\. #\. #\. #\. #\. #\.)))
+
+(define-struct wpos (row col horiz? len))
+;; A WPos (Word Position) is a (make-wpos Nat Nat Bool Nat) ;; requires: len > 1
+(define-struct state (grid positions words))
+;; A State is a (make-state Grid (listof WPos) (listof Str))
+
+;; (flip wp) transposes wp by reversing row/col and negating horiz?
+;; flip: WPos -> WPos
+;; Example:
+(check-expect (flip (make-wpos 3 4 true 5))
+              (make-wpos 4 3 false 5))
+
+(define (flip wp)
+  (make-wpos (wpos-col wp) (wpos-row wp) (not (wpos-horiz? wp)) (wpos-len wp)))
+
+(define (first-ele grid)
+  (map first grid))
+
+(define (strip-1 grid)
+  (map rest grid))
+
+(define (transpose grid)
+  (cond [(empty? grid) empty]
+         [(empty? (first grid)) empty]
+        [else (cons (first-ele grid) (transpose (strip-1 grid)))]))
+
+(transpose grid-abc)
+        
